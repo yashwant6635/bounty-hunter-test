@@ -8,14 +8,15 @@
 export function formatCurrency(amount: number, currency: string = "USD"): string {
   const symbols: Record<string, string> = {
     USD: "$",
-    EUR: "€",
-    GBP: "£",
+    EUR: "\u20ac",
+    GBP: "\u00a3",
   };
   const symbol = symbols[currency] || currency + " ";
-  
-  // BUG: doesn't handle negative numbers correctly
-  // BUG: doesn't handle zero decimal places (shows "$100" not "$100.00")
-  const formatted = amount.toLocaleString("en-US");
+
+  const formatted = amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   return `${symbol}${formatted}`;
 }
 
@@ -26,7 +27,6 @@ export function formatCurrency(amount: number, currency: string = "USD"): string
  * @returns The numeric value
  */
 export function parseCurrency(str: string): number {
-  // BUG: doesn't strip currency symbols properly — only strips $
-  const cleaned = str.replace("$", "").replace(/,/g, "");
+  const cleaned = str.replace(/[^0-9.-]+/g, "");
   return parseFloat(cleaned);
 }
